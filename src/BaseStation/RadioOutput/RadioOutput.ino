@@ -1,4 +1,5 @@
 #include <HardwareSerial.h>
+#include "StringSplitter.h"
 #include "sbus.h"
 
 #define OUTPUT_UPDATE_TASK_MS 20
@@ -22,18 +23,10 @@ uint32_t channelVal = 0;  //temp testing value
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
+    Serial.setTimeout(5); //serial should be fast enough to transmit everything in this time. if not, increase this value.
 
     sbusSerial.begin(100000, SERIAL_8E2, SERIAL1_RX, SERIAL1_TX, false, 100UL);
-
-    xTaskCreatePinnedToCore(
-        ioTaskHandler, /* Function to implement the task */
-        "outputTask",  /* Name of the task */
-        10000,         /* Stack size in words */
-        NULL,          /* Task input parameter */
-        0,             /* Priority of the task */
-        &ioTask,       /* Task handle. */
-        0);
 
     // Set channels to default values
     for (uint8_t i = 0; i < SBUS_CHANNEL_COUNT; i++)
@@ -55,33 +48,6 @@ int getRcChannel_wrapper(uint8_t channel)
     }
 }
 
-//Configure the program outputs
-void outputSubtask()
-{
-    for(uint8_t i = 0; i < SBUS_CHANNEL_COUNT; i++) {
-      output.channels[i] += 1;
-      if(output.channels[i] >= 2000) {
-        output.channels[i] = 1000;
-      }
-    }
-}
-
-void ioTaskHandler(void *pvParameters)
-{
-    portTickType xLastWakeTime;
-    const portTickType xPeriod = OUTPUT_UPDATE_TASK_MS / portTICK_PERIOD_MS;
-    xLastWakeTime = xTaskGetTickCount();
-
-    while (true)
-    {
-        outputSubtask();
-
-        // Put task to sleep
-        vTaskDelayUntil(&xLastWakeTime, xPeriod);
-    }
-    vTaskDelete(NULL);
-}
-
 void loop()
 {
     /* 
@@ -93,5 +59,20 @@ void loop()
         sbusSerial.write(sbusPacket, SBUS_PACKET_LENGTH);
 
         nextSbusTaskMs = millis() + SBUS_UPDATE_TASK_MS;
+    }
+
+    /*
+     * Get new data via serial
+     */
+    if(Serial.available()) {
+        String inputs = Serial.readString();  //read until timeout
+        inputs.trim();                        // remove any \r \n whitespace at the end of the String
+
+        StringSplitter *splitter = new StringSplitter(inputs, ':', 4);  // Get the four input values
+
+        output.channels[0] = (uint16_t)splitter->getItemAtIndex(0).toInt();
+        output.channels[1] = (uint16_t)splitter->getItemAtIndex(1).toInt();
+        output.channels[2] = (uint16_t)splitter->getItemAtIndex(2).toInt();
+        output.channels[3] = (uint16_t)splitter->getItemAtIndex(3).toInt();
     }
 }
