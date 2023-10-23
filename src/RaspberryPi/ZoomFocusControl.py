@@ -23,36 +23,48 @@ def main():
     focuser = Focuser(1)    
     prevZoomValue = 0
     prevFocusValue = 0
+    prevPanValue = 0
+    prevTiltValue = 0
     
     # Setup the gimbal controls
-    pan_pin = 14
-    tilt_pin = 15
+    pan_pin = 18
+    tilt_pin = 17
     pi = pigpio.pi()
 
     while True:
 
-        # Wait for the next input
-        while ser.in_waiting == 0 and focuser.isBusy:
-            time.sleep(1)
+        # Read until we get to the latest, most recent line
+        line = 'empty'
+        while ser.in_waiting > 0:
+            line = ser.readline().decode('ascii').rstrip()
+    
+        # Only proceed if data was read
+        if line == 'empty':
+            continue
 
         # Split the inputs into a list
-        line = ser.readline().decode('ascii').rstrip()
         split_values = line.split(":")
         values = [int(value) for value in split_values]
 
-        # update the gimbal position
-        # TODO: map the values to the correct servo values.
-        pi.set_servo_pulsewidth(pan_pin, values[0])
-        pi.set_servo_pulsewidth(tilt_pin, values[1])
+        if values[0] != prevPanValue or values[1] != prevTiltValue:
+            # Update the gimbal position
+            if values[1] < 1400:
+                values[1] = 1400
+            elif values[1] > 1600:
+                values[1] = 1600
+        
+            pi.set_servo_pulsewidth(pan_pin, values[0])
+            pi.set_servo_pulsewidth(tilt_pin, values[1])
+            prevPanValue = values[0]
+            prevTiltValue = values[1]
 
-        newZoomValue  = values[2] # line[0:10]
-        newFocusValue = values[3] # line[10:20]
-
-        focuser.set(Focuser.OPT_ZOOM, newZoomValue)
-        focuser.set(Focuser.OPT_FOCUS, newFocusValue)
-
-        ser.reset_input_buffer() # clear out any inputs that have been received since the last update
-    
+        if not focuser.isBusy and (values[2] != prevZoomValue or values[3] != prevFocusValue):
+            # Update zoom/focus
+            prevZoomValue = values[2]
+            prevFocusValue = values[3]
+            focuser.set(Focuser.OPT_ZOOM, (newZoomValue - 1000) * 25)
+            focuser.set(Focuser.OPT_FOCUS, (newFocusValue - 1000) * 25)
+        
 
 if __name__ == "__main__":
    main()

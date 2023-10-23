@@ -31,7 +31,7 @@ int main() {
     ::noecho(); // Don't echo input characters to the screen
 
     io_service io;
-    serial_port sp(io, "/dev/tty.usbmodem3485187B9DA02");   //replace with filepath of arduino
+    serial_port sp(io, "/dev/tty.usbmodem3485187B55B02");   //replace with filepath of arduino
     sp.set_option(serial_port_base::baud_rate(115200));
     sp.set_option(serial_port_base::flow_control(serial_port_base::flow_control::none));
     sp.set_option(serial_port_base::parity(serial_port_base::parity::none));
