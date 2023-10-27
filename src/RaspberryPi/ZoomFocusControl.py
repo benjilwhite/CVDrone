@@ -17,7 +17,7 @@ def main():
 
     # establish a serial connection with the arduino
     # run the command "ls /dev/tty*" on the raspberry pi to see what port it is connected to
-    ser = serial.Serial('/dev/ttyUSB0', baudrate = 115200, parity = serial.PARITY_NONE, stopbits = serial.STOPBITS_ONE, bytesize = serial.EIGHTBITS, timeout=1)
+    ser = serial.Serial('/dev/ttyACM0', baudrate = 115200, parity = serial.PARITY_NONE, stopbits = serial.STOPBITS_ONE, bytesize = serial.EIGHTBITS, timeout=1)
 
     # i2c_bus = 1
     focuser = Focuser(1)    
@@ -58,12 +58,12 @@ def main():
             prevPanValue = values[0]
             prevTiltValue = values[1]
 
-        if not focuser.isBusy and (values[2] != prevZoomValue or values[3] != prevFocusValue):
+        if values[2] != prevZoomValue or values[3] != prevFocusValue:
             # Update zoom/focus
             prevZoomValue = values[2]
             prevFocusValue = values[3]
-            focuser.set(Focuser.OPT_ZOOM, (newZoomValue - 1000) * 25)
-            focuser.set(Focuser.OPT_FOCUS, (newFocusValue - 1000) * 25)
+            focuser.set(Focuser.OPT_ZOOM, (prevZoomValue - 1000) * 20)
+            focuser.set(Focuser.OPT_FOCUS, (prevFocusValue - 1000) * 20)
         
 
 if __name__ == "__main__":

@@ -41,8 +41,8 @@ int main() {
     // Default values for pan, tilt, zoom, and focus
     int pan = 1500;
     int tilt = 1500;
-    int zoom = 1500;
-    int focus = 1500;
+    int zoom = 0;
+    int focus = 0;
 
     printw("Pan:  %d\nTilt: %d\nZoom: %d\nFocus: %d\n", pan, tilt, zoom, focus);
     int ch = 0;
@@ -52,10 +52,10 @@ int main() {
 
         switch (ch) {
             case 'w':
-                if(tilt < 2000) tilt += 20;
+                if(tilt < 1600) tilt += 20;
                 break;
             case 's':
-                if(tilt > 1000) tilt -= 20;
+                if(tilt > 1400) tilt -= 20;
                 break;
             case 'a':
                 if(pan > 1000) pan -= 20;
@@ -78,14 +78,14 @@ int main() {
             default:
                 break;
         }
-        ::printw("Pan:  %d\nTilt: %d\nZoom: %d\nFocus: %d\n", pan, tilt, zoom, focus);
+        ::printw("Pan:  %d\nTilt: %d\nZoom: %d\nFocus: %d\n", pan, tilt, (zoom - 1000) * 20, (focus - 1000) * 20);
         ::refresh(); // Refresh the screen
 
         boost::asio::streambuf buf;
         string message = std::to_string(pan) + ":"
-                         + std::to_string(tilt) + ":"
-                         + std::to_string(zoom) + ":"
-                         + std::to_string(focus);
+                       + std::to_string(tilt) + ":"
+                       + std::to_string(zoom) + ":"
+                       + std::to_string(focus);
         write(sp, buffer(message));
     }
     ::endwin(); // Clean up ncurses
