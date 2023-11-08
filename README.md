@@ -10,8 +10,6 @@ Here's the current layout of the system.
 
 ![image](media/diagram.png)
 
-If this seems unnecessarily complex, I'd have to agree with you. I started this project using existing libraries to interface between components, and in particular the zoom lens controller library is designed to run on a Raspberry Pi. **My current goal is to remove the Raspberry Pi from this diagram by rewriting the pan/tilt/zoom library in C++ and running it on the Arduino.** It's just a matter of rewriting the I2C functions to use the Arduino versions, which will allow me to remove weight/complexity from the drone and reduce control latency.
-
 ### Hardware Components
 
 ##### Video Feed
