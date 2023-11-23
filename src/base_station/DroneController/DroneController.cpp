@@ -51,6 +51,16 @@ void DroneController::setPosition(int pan, int tilt) {
     transmitValues();
 }
 
+void DroneController::setPanAngle(int angle) {
+    _pan_position = int(angle * 5.55 + 1000);
+    transmitValues();
+}
+
+void DroneController::setTiltAngle(int angle) {
+    _tilt_position = int(angle * 5.55 + 1000);
+    transmitValues();
+}
+
 // Reset position to facing forward and level
 void DroneController::center() {
     this->setPosition(1500, 1500);

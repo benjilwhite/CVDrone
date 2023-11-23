@@ -18,6 +18,8 @@ public:
     ~DroneController();
     void center(void);
     void setPosition(int x, int y);
+    void setPanAngle(int angle);
+    void setTiltAngle(int angle);
     void changeZoom(int zoom);
     void changeFocus(int focus);
 private:
