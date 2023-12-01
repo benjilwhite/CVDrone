@@ -2,6 +2,8 @@
 
 ![image](media/front_view.jpeg)
 
+https://github.com/benjilwhite/CVDrone/assets/80803128/c2de09a2-331a-40f0-a45e-6ba09113383a
+
 The goal of this project is to create a relatively inexpensive camera platform that can be mounted on a drone, transmit a 1080p video feed, and remotely control pan, tilt, and optical zoom. An interface to this will make it simple to develop computer vision applications that require camera movements.
 
 ## Wiring/Communication Diagram
